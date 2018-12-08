@@ -1,0 +1,258 @@
+---
+title: 在R中使用windows系统自带的中文字体
+author: Sheng Luan
+date: '2017-12-31'
+slug: using-other-system-chinese-fonts-in-r
+categories:
+  - R
+tags:
+  - font
+  - showtext
+---
+
+
+
+<p>R作图时，如何在图片中使用windows系统自带的其他中文字体？以前尝试过好几次，都没有成功。</p>
+<p>首先安装二个包：</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/sysfonts/index.html">sysfonts</a></li>
+<li><a href="https://cran.r-project.org/web/packages/showtext/index.html">showtext</a></li>
+</ul>
+<p>R中自带的默认字体家族，可以通过sysfonts::font.families()函数查看：</p>
+<pre class="r"><code>require(sysfonts)</code></pre>
+<pre><code>## Loading required package: sysfonts</code></pre>
+<pre class="r"><code>require(showtext)</code></pre>
+<pre><code>## Loading required package: showtext</code></pre>
+<pre><code>## Loading required package: showtextdb</code></pre>
+<pre class="r"><code>font_families()</code></pre>
+<pre><code>## [1] &quot;sans&quot;         &quot;serif&quot;        &quot;mono&quot;         &quot;wqy-microhei&quot;</code></pre>
+<p>R中自带的三种标准字体家族为：<a href="https://baike.baidu.com/item/衬线字体/6820704?fr=aladdin">serif</a>（衬线）、<a href="https://baike.baidu.com/item/无衬线体/2374029">sans</a>（无衬线）和<a href="https://baike.baidu.com/item/等宽字体/8434037?fr=aladdin">mono</a>（等宽）三类。</p>
+<p>如果想使用Windows系统中自带的中文字体，首先查看系统中字体存储路径：</p>
+<pre class="r"><code>font_paths()</code></pre>
+<pre><code>## [1] &quot;C:\\Windows\\Fonts&quot;</code></pre>
+<p>进一步查看有哪些可以利用的字体文件：</p>
+<pre class="r"><code>font_files()</code></pre>
+<pre><code>##   [1] &quot;AGENCYB.TTF&quot;             &quot;AGENCYR.TTF&quot;            
+##   [3] &quot;ALGER.TTF&quot;               &quot;ANTQUAB.TTF&quot;            
+##   [5] &quot;ANTQUABI.TTF&quot;            &quot;ANTQUAI.TTF&quot;            
+##   [7] &quot;arial.ttf&quot;               &quot;arialbd.ttf&quot;            
+##   [9] &quot;arialbi.ttf&quot;             &quot;ariali.ttf&quot;             
+##  [11] &quot;ARIALN.TTF&quot;              &quot;ARIALNB.TTF&quot;            
+##  [13] &quot;ARIALNBI.TTF&quot;            &quot;ARIALNI.TTF&quot;            
+##  [15] &quot;ariblk.ttf&quot;              &quot;ARLRDBD.TTF&quot;            
+##  [17] &quot;bahnschrift.ttf&quot;         &quot;BASKVILL.TTF&quot;           
+##  [19] &quot;BAUHS93.TTF&quot;             &quot;BELL.TTF&quot;               
+##  [21] &quot;BELLB.TTF&quot;               &quot;BELLI.TTF&quot;              
+##  [23] &quot;BERNHC.TTF&quot;              &quot;BKANT.TTF&quot;              
+##  [25] &quot;BOD_B.TTF&quot;               &quot;BOD_BI.TTF&quot;             
+##  [27] &quot;BOD_BLAI.TTF&quot;            &quot;BOD_BLAR.TTF&quot;           
+##  [29] &quot;BOD_CB.TTF&quot;              &quot;BOD_CBI.TTF&quot;            
+##  [31] &quot;BOD_CI.TTF&quot;              &quot;BOD_CR.TTF&quot;             
+##  [33] &quot;BOD_I.TTF&quot;               &quot;BOD_PSTC.TTF&quot;           
+##  [35] &quot;BOD_R.TTF&quot;               &quot;BOOKOS.TTF&quot;             
+##  [37] &quot;BOOKOSB.TTF&quot;             &quot;BOOKOSBI.TTF&quot;           
+##  [39] &quot;BOOKOSI.TTF&quot;             &quot;BRADHITC.TTF&quot;           
+##  [41] &quot;BRITANIC.TTF&quot;            &quot;BRLNSB.TTF&quot;             
+##  [43] &quot;BRLNSDB.TTF&quot;             &quot;BRLNSR.TTF&quot;             
+##  [45] &quot;BROADW.TTF&quot;              &quot;BRUSHSCI.TTF&quot;           
+##  [47] &quot;BSSYM7.TTF&quot;              &quot;calibri.ttf&quot;            
+##  [49] &quot;calibrib.ttf&quot;            &quot;calibrii.ttf&quot;           
+##  [51] &quot;calibril.ttf&quot;            &quot;calibrili.ttf&quot;          
+##  [53] &quot;calibriz.ttf&quot;            &quot;CALIFB.TTF&quot;             
+##  [55] &quot;CALIFI.TTF&quot;              &quot;CALIFR.TTF&quot;             
+##  [57] &quot;CALIST.TTF&quot;              &quot;CALISTB.TTF&quot;            
+##  [59] &quot;CALISTBI.TTF&quot;            &quot;CALISTI.TTF&quot;            
+##  [61] &quot;cambria.ttc&quot;             &quot;cambriab.ttf&quot;           
+##  [63] &quot;cambriai.ttf&quot;            &quot;cambriaz.ttf&quot;           
+##  [65] &quot;Candara.ttf&quot;             &quot;Candarab.ttf&quot;           
+##  [67] &quot;Candarai.ttf&quot;            &quot;Candaraz.ttf&quot;           
+##  [69] &quot;CASTELAR.TTF&quot;            &quot;CENSCBK.TTF&quot;            
+##  [71] &quot;CENTAUR.TTF&quot;             &quot;CENTURY.TTF&quot;            
+##  [73] &quot;CHILLER.TTF&quot;             &quot;COLONNA.TTF&quot;            
+##  [75] &quot;comic.ttf&quot;               &quot;comicbd.ttf&quot;            
+##  [77] &quot;comici.ttf&quot;              &quot;comicz.ttf&quot;             
+##  [79] &quot;consola.ttf&quot;             &quot;consolab.ttf&quot;           
+##  [81] &quot;consolai.ttf&quot;            &quot;consolaz.ttf&quot;           
+##  [83] &quot;constan.ttf&quot;             &quot;constanb.ttf&quot;           
+##  [85] &quot;constani.ttf&quot;            &quot;constanz.ttf&quot;           
+##  [87] &quot;COOPBL.TTF&quot;              &quot;COPRGTB.TTF&quot;            
+##  [89] &quot;COPRGTL.TTF&quot;             &quot;corbel.ttf&quot;             
+##  [91] &quot;corbelb.ttf&quot;             &quot;corbeli.ttf&quot;            
+##  [93] &quot;corbelz.ttf&quot;             &quot;cour.ttf&quot;               
+##  [95] &quot;courbd.ttf&quot;              &quot;courbi.ttf&quot;             
+##  [97] &quot;couri.ttf&quot;               &quot;CURLZ___.TTF&quot;           
+##  [99] &quot;Deng.ttf&quot;                &quot;Dengb.ttf&quot;              
+## [101] &quot;Dengl.ttf&quot;               &quot;ebrima.ttf&quot;             
+## [103] &quot;ebrimabd.ttf&quot;            &quot;ELEPHNT.TTF&quot;            
+## [105] &quot;ELEPHNTI.TTF&quot;            &quot;ENGR.TTF&quot;               
+## [107] &quot;ERASBD.TTF&quot;              &quot;ERASDEMI.TTF&quot;           
+## [109] &quot;ERASLGHT.TTF&quot;            &quot;ERASMD.TTF&quot;             
+## [111] &quot;euclid.ttf&quot;              &quot;euclidb.ttf&quot;            
+## [113] &quot;euclidbi.ttf&quot;            &quot;euclidi.ttf&quot;            
+## [115] &quot;eucsym.ttf&quot;              &quot;eucsymb.ttf&quot;            
+## [117] &quot;eucsymbi.ttf&quot;            &quot;eucsymi.ttf&quot;            
+## [119] &quot;euextra.ttf&quot;             &quot;euextrab.ttf&quot;           
+## [121] &quot;eufrak.ttf&quot;              &quot;eufrakb.ttf&quot;            
+## [123] &quot;eumat1.ttf&quot;              &quot;eumat1b.ttf&quot;            
+## [125] &quot;eumat2.ttf&quot;              &quot;eumat2b.ttf&quot;            
+## [127] &quot;FELIXTI.TTF&quot;             &quot;fences.ttf&quot;             
+## [129] &quot;FORTE.TTF&quot;               &quot;FRABK.TTF&quot;              
+## [131] &quot;FRABKIT.TTF&quot;             &quot;FRADM.TTF&quot;              
+## [133] &quot;FRADMCN.TTF&quot;             &quot;FRADMIT.TTF&quot;            
+## [135] &quot;FRAHV.TTF&quot;               &quot;FRAHVIT.TTF&quot;            
+## [137] &quot;framd.ttf&quot;               &quot;FRAMDCN.TTF&quot;            
+## [139] &quot;framdit.ttf&quot;             &quot;FREESCPT.TTF&quot;           
+## [141] &quot;FRSCRIPT.TTF&quot;            &quot;FTLTLT.TTF&quot;             
+## [143] &quot;FZSTK.TTF&quot;               &quot;FZYTK.TTF&quot;              
+## [145] &quot;Gabriola.ttf&quot;            &quot;gadugi.ttf&quot;             
+## [147] &quot;gadugib.ttf&quot;             &quot;GARA.TTF&quot;               
+## [149] &quot;GARABD.TTF&quot;              &quot;GARAIT.TTF&quot;             
+## [151] &quot;georgia.ttf&quot;             &quot;georgiab.ttf&quot;           
+## [153] &quot;georgiai.ttf&quot;            &quot;georgiaz.ttf&quot;           
+## [155] &quot;GIGI.TTF&quot;                &quot;GIL_____.TTF&quot;           
+## [157] &quot;GILB____.TTF&quot;            &quot;GILBI___.TTF&quot;           
+## [159] &quot;GILC____.TTF&quot;            &quot;GILI____.TTF&quot;           
+## [161] &quot;GILLUBCD.TTF&quot;            &quot;GILSANUB.TTF&quot;           
+## [163] &quot;GLECB.TTF&quot;               &quot;GLSNECB.TTF&quot;            
+## [165] &quot;GOTHIC.TTF&quot;              &quot;GOTHICB.TTF&quot;            
+## [167] &quot;GOTHICBI.TTF&quot;            &quot;GOTHICI.TTF&quot;            
+## [169] &quot;GOUDOS.TTF&quot;              &quot;GOUDOSB.TTF&quot;            
+## [171] &quot;GOUDOSI.TTF&quot;             &quot;GOUDYSTO.TTF&quot;           
+## [173] &quot;HARLOWSI.TTF&quot;            &quot;HARNGTON.TTF&quot;           
+## [175] &quot;HATTEN.TTF&quot;              &quot;himalaya.ttf&quot;           
+## [177] &quot;holomdl2.ttf&quot;            &quot;HTOWERT.TTF&quot;            
+## [179] &quot;HTOWERTI.TTF&quot;            &quot;impact.ttf&quot;             
+## [181] &quot;IMPRISHA.TTF&quot;            &quot;INFROMAN.TTF&quot;           
+## [183] &quot;iqiyi_logov4.ttf&quot;        &quot;ITCBLKAD.TTF&quot;           
+## [185] &quot;ITCEDSCR.TTF&quot;            &quot;ITCKRIST.TTF&quot;           
+## [187] &quot;javatext.ttf&quot;            &quot;JOKERMAN.TTF&quot;           
+## [189] &quot;JUICE___.TTF&quot;            &quot;KUNSTLER.TTF&quot;           
+## [191] &quot;l_10646.ttf&quot;             &quot;LATINWD.TTF&quot;            
+## [193] &quot;LBRITE.TTF&quot;              &quot;LBRITED.TTF&quot;            
+## [195] &quot;LBRITEDI.TTF&quot;            &quot;LBRITEI.TTF&quot;            
+## [197] &quot;LCALLIG.TTF&quot;             &quot;LeelaUIb.ttf&quot;           
+## [199] &quot;LeelawUI.ttf&quot;            &quot;LeelUIsl.ttf&quot;           
+## [201] &quot;LFAX.TTF&quot;                &quot;LFAXD.TTF&quot;              
+## [203] &quot;LFAXDI.TTF&quot;              &quot;LFAXI.TTF&quot;              
+## [205] &quot;LHANDW.TTF&quot;              &quot;LSANS.TTF&quot;              
+## [207] &quot;LSANSD.TTF&quot;              &quot;LSANSDI.TTF&quot;            
+## [209] &quot;LSANSI.TTF&quot;              &quot;LTYPE.TTF&quot;              
+## [211] &quot;LTYPEB.TTF&quot;              &quot;LTYPEBO.TTF&quot;            
+## [213] &quot;LTYPEO.TTF&quot;              &quot;lucon.ttf&quot;              
+## [215] &quot;MAGNETOB.TTF&quot;            &quot;MAIAN.TTF&quot;              
+## [217] &quot;malgun.ttf&quot;              &quot;malgunbd.ttf&quot;           
+## [219] &quot;malgunsl.ttf&quot;            &quot;marlett.ttf&quot;            
+## [221] &quot;MATURASC.TTF&quot;            &quot;micross.ttf&quot;            
+## [223] &quot;mingliub.ttc&quot;            &quot;MISTRAL.TTF&quot;            
+## [225] &quot;mmrtext.ttf&quot;             &quot;mmrtextb.ttf&quot;           
+## [227] &quot;MOD20.TTF&quot;               &quot;monbaiti.ttf&quot;           
+## [229] &quot;msgothic.ttc&quot;            &quot;msjh.ttc&quot;               
+## [231] &quot;msjhbd.ttc&quot;              &quot;msjhl.ttc&quot;              
+## [233] &quot;msyh.ttc&quot;                &quot;msyhbd.ttc&quot;             
+## [235] &quot;msyhl.ttc&quot;               &quot;msyi.ttf&quot;               
+## [237] &quot;Mt Extra Tiger.ttf&quot;      &quot;MTCORSVA.TTF&quot;           
+## [239] &quot;mtextra.ttf&quot;             &quot;mvboli.ttf&quot;             
+## [241] &quot;NIAGENG.TTF&quot;             &quot;NIAGSOL.TTF&quot;            
+## [243] &quot;Nirmala.ttf&quot;             &quot;NirmalaB.ttf&quot;           
+## [245] &quot;NirmalaS.ttf&quot;            &quot;ntailu.ttf&quot;             
+## [247] &quot;ntailub.ttf&quot;             &quot;OCRAEXT.TTF&quot;            
+## [249] &quot;OLDENGL.TTF&quot;             &quot;ONYX.TTF&quot;               
+## [251] &quot;OUTLOOK.TTF&quot;             &quot;pala.ttf&quot;               
+## [253] &quot;palab.ttf&quot;               &quot;palabi.ttf&quot;             
+## [255] &quot;palai.ttf&quot;               &quot;PALSCRI.TTF&quot;            
+## [257] &quot;PAPYRUS.TTF&quot;             &quot;PARCHM.TTF&quot;             
+## [259] &quot;PER_____.TTF&quot;            &quot;PERB____.TTF&quot;           
+## [261] &quot;PERBI___.TTF&quot;            &quot;PERI____.TTF&quot;           
+## [263] &quot;PERTIBD.TTF&quot;             &quot;PERTILI.TTF&quot;            
+## [265] &quot;phagspa.ttf&quot;             &quot;phagspab.ttf&quot;           
+## [267] &quot;PLAYBILL.TTF&quot;            &quot;POORICH.TTF&quot;            
+## [269] &quot;PRISTINA.TTF&quot;            &quot;RAGE.TTF&quot;               
+## [271] &quot;RAVIE.TTF&quot;               &quot;REFSAN.TTF&quot;             
+## [273] &quot;REFSPCL.TTF&quot;             &quot;ROCC____.TTF&quot;           
+## [275] &quot;ROCCB___.TTF&quot;            &quot;ROCK.TTF&quot;               
+## [277] &quot;ROCKB.TTF&quot;               &quot;ROCKBI.TTF&quot;             
+## [279] &quot;ROCKEB.TTF&quot;              &quot;ROCKI.TTF&quot;              
+## [281] &quot;SCHLBKB.TTF&quot;             &quot;SCHLBKBI.TTF&quot;           
+## [283] &quot;SCHLBKI.TTF&quot;             &quot;SCRIPTBL.TTF&quot;           
+## [285] &quot;segmdl2.ttf&quot;             &quot;segoepr.ttf&quot;            
+## [287] &quot;segoeprb.ttf&quot;            &quot;segoesc.ttf&quot;            
+## [289] &quot;segoescb.ttf&quot;            &quot;segoeui.ttf&quot;            
+## [291] &quot;segoeuib.ttf&quot;            &quot;segoeuii.ttf&quot;           
+## [293] &quot;segoeuil.ttf&quot;            &quot;segoeuisl.ttf&quot;          
+## [295] &quot;segoeuiz.ttf&quot;            &quot;seguibl.ttf&quot;            
+## [297] &quot;seguibli.ttf&quot;            &quot;seguiemj.ttf&quot;           
+## [299] &quot;seguihis.ttf&quot;            &quot;seguili.ttf&quot;            
+## [301] &quot;seguisb.ttf&quot;             &quot;seguisbi.ttf&quot;           
+## [303] &quot;seguisli.ttf&quot;            &quot;seguisym.ttf&quot;           
+## [305] &quot;SHOWG.TTF&quot;               &quot;simfang.ttf&quot;            
+## [307] &quot;simhei.ttf&quot;              &quot;simkai.ttf&quot;             
+## [309] &quot;SIMLI.TTF&quot;               &quot;simsun.ttc&quot;             
+## [311] &quot;simsunb.ttf&quot;             &quot;SIMYOU.TTF&quot;             
+## [313] &quot;Sitka.ttc&quot;               &quot;SitkaB.ttc&quot;             
+## [315] &quot;SitkaI.ttc&quot;              &quot;SitkaZ.ttc&quot;             
+## [317] &quot;SNAP____.TTF&quot;            &quot;STCAIYUN.TTF&quot;           
+## [319] &quot;STENCIL.TTF&quot;             &quot;STFANGSO.TTF&quot;           
+## [321] &quot;STHUPO.TTF&quot;              &quot;STKAITI.TTF&quot;            
+## [323] &quot;STLITI.TTF&quot;              &quot;STSONG.TTF&quot;             
+## [325] &quot;STXIHEI.TTF&quot;             &quot;STXINGKA.TTF&quot;           
+## [327] &quot;STXINWEI.TTF&quot;            &quot;STZHONGS.TTF&quot;           
+## [329] &quot;sylfaen.ttf&quot;             &quot;Symbol Tiger Expert.ttf&quot;
+## [331] &quot;Symbol Tiger.ttf&quot;        &quot;symbol.ttf&quot;             
+## [333] &quot;tahoma.ttf&quot;              &quot;tahomabd.ttf&quot;           
+## [335] &quot;taile.ttf&quot;               &quot;taileb.ttf&quot;             
+## [337] &quot;TCB_____.TTF&quot;            &quot;TCBI____.TTF&quot;           
+## [339] &quot;TCCB____.TTF&quot;            &quot;TCCEB.TTF&quot;              
+## [341] &quot;TCCM____.TTF&quot;            &quot;TCM_____.TTF&quot;           
+## [343] &quot;TCMI____.TTF&quot;            &quot;TEMPSITC.TTF&quot;           
+## [345] &quot;Tiger Expert.ttf&quot;        &quot;Tiger.ttf&quot;              
+## [347] &quot;times.ttf&quot;               &quot;timesbd.ttf&quot;            
+## [349] &quot;timesbi.ttf&quot;             &quot;timesi.ttf&quot;             
+## [351] &quot;trebuc.ttf&quot;              &quot;trebucbd.ttf&quot;           
+## [353] &quot;trebucbi.ttf&quot;            &quot;trebucit.ttf&quot;           
+## [355] &quot;verdana.ttf&quot;             &quot;verdanab.ttf&quot;           
+## [357] &quot;verdanai.ttf&quot;            &quot;verdanaz.ttf&quot;           
+## [359] &quot;VINERITC.TTF&quot;            &quot;VIVALDII.TTF&quot;           
+## [361] &quot;VLADIMIR.TTF&quot;            &quot;webdings.ttf&quot;           
+## [363] &quot;wingding.ttf&quot;            &quot;WINGDNG2.TTF&quot;           
+## [365] &quot;WINGDNG3.TTF&quot;            &quot;YuGothB.ttc&quot;            
+## [367] &quot;YuGothL.ttc&quot;             &quot;YuGothM.ttc&quot;            
+## [369] &quot;YuGothR.ttc&quot;             &quot;ZWAdobeF.TTF&quot;</code></pre>
+<p>其中宋体文件是simsun.ttc，黑体文件是：simhei.ttf，楷体文件是simkai.ttf，微软雅黑是msyh.ttf和msyhbd.ttf。</p>
+<p>尝试在R环境中加入黑体（如果字体是在Windows系统的默认字体库中，regular可以不用指定路径）：</p>
+<pre class="r"><code>font_add(family = &quot;heiti&quot;,regular = &quot;simhei.ttf&quot;)
+font_add(family = &quot;kaiti&quot;,regular = &quot;simkai.ttf&quot;)</code></pre>
+<p>此时查看R中自带字体，你会发现多了“heiti”和“kaiti”。</p>
+<pre class="r"><code>font.families()</code></pre>
+<pre><code>## &#39;font.families()&#39; is now renamed to &#39;font_families()&#39;
+## The old version still works, but consider using the new function in future code</code></pre>
+<pre><code>## [1] &quot;sans&quot;         &quot;serif&quot;        &quot;mono&quot;         &quot;wqy-microhei&quot;
+## [5] &quot;heiti&quot;        &quot;kaiti&quot;</code></pre>
+<p>然后我们在画图中使用黑体，借用showtext包作者邱逸轩的这篇文章<a href="https://cosx.org/2014/01/showtext-interesting-fonts-and-graphs">showtext：字体，好玩的字体和好玩的图形</a>中的r示例代码：</p>
+<p>需要注意，<strong>rstudio自带的Plots面板中绘出的图形不显示自定义字体</strong>，这也是以前总是觉得设置自定义字体不成功的原因。在运行下面的代码前，调用windows()函数打开一个新的图形接收窗口，下边代码绘制的图形会显示其中。</p>
+<p>如果你打算在Rmd文档中使用showtext包，请在chunk头参数中设置fig.showtext=TRUE。</p>
+<pre class="r"><code>showtext_auto() #这样代码非常重要
+set.seed(123)
+plot(1, xlim = c(-3, 3), ylim = c(-3, 3), type = &quot;n&quot;)
+text(runif(100, -3, 3), runif(100, -3, 3),
+     intToUtf8(round(runif(100, 19968, 40869)), multiple = TRUE),
+     col = rgb(runif(100), runif(100), runif(100), 0.5 + runif(100)/2),
+     cex = 2, family = &quot;heiti&quot;)   # 指定heiti字体
+title(&quot;随机汉字&quot;, family = &quot;kaiti&quot;)   # 指定kaiti字体</code></pre>
+<p><img src="/post/2017-12-31-using-other-system-chinese-fonts-in-r_files/figure-html/fontexample-1.png" width="672" /></p>
+<p>试一下ggplot2作图。</p>
+<pre class="r"><code>require(ggplot2)</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre class="r"><code>xy &lt;- data.frame(x=rnorm(100),y=rnorm(100))
+showtext_auto()
+scatter.plot &lt;- ggplot(data = xy,aes(x=x,y=y))+
+  geom_point(shape=21)+
+  labs(x=&quot;均值为0，标准差为1的随机正态分布&quot;,y=&quot;均值为0，标准差为1的随机正态分布&quot;)+
+  theme_grey(base_size = 30,base_family = &quot;heiti&quot;)
+print(scatter.plot)</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:ggplot2example"></span>
+<img src="/post/2017-12-31-using-other-system-chinese-fonts-in-r_files/figure-html/ggplot2example-1.png" alt="基于0,1正态分布的散点图" width="576" />
+<p class="caption">
+Figure 1: 基于0,1正态分布的散点图
+</p>
+</div>
+<p>Ok!大功告成！</p>
