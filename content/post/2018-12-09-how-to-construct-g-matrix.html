@@ -1,7 +1,7 @@
 ---
 title: 如何构建G矩阵-基因组亲缘关系矩阵（Genomic relationships matrix）
 author: Sheng Luan
-date: '2018-12-10'
+date: '2018-12-11'
 slug: how-to-construct-g-matrix
 categories:
   - 数量遗传学
@@ -25,7 +25,7 @@ tags:
 </ul>
 <p>通常我们会讲，如果一段DNA在两个或者多个个体中均有一致的核苷酸序列，那么可以定义该DNA片段属性为状态同源，即IBS。</p>
 <p>在两个或者多个个体中的一个IBS片段，如果遗传自一个共同的祖先个体，且没有发生重组，那么该片段也是血缘同源的，即IBD。</p>
-<p>一段DNA片段，如果是IBD，那么肯定也是IBS；如果片段不是IBD，也有可能是IBS，因为不同个体中发生了相同的突变，或者重组没有改变片段等原因所致。</p>
+<p>一段DNA，如果是IBD，那么肯定也是IBS；如果片段不是IBD，也有可能是IBS，因为不同个体中发生了相同的突变，或者重组没有改变片段等原因所致。</p>
 <p>关于IBD和IBS的定义，参见<a href="https://en.wikipedia.org/wiki/Identity_by_descent">WIKIPEDIA</a>。</p>
 <p>个体间的亲缘关系，可以通过以下两种方法估计：</p>
 <ul>
@@ -40,7 +40,7 @@ tags:
 <pre class="r"><code>rm(list=ls())
 # 加载synbreed包
 is_installed &lt;- require(xtable)</code></pre>
-<pre><code>## 载入需要的程辑包：xtable</code></pre>
+<pre><code>## Loading required package: xtable</code></pre>
 <pre class="r"><code>if (!is_installed) {
   install.packages(&quot;xtable&quot;)
   library(xtable)
@@ -56,7 +56,7 @@ genotypes &lt;-
   )
 print(xtable(genotypes),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:25:03 2018 -->
+<!-- Tue Dec 11 07:51:29 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -130,7 +130,7 @@ AA
 <p>转换用到了synbreed包中的codeGeno函数。</p>
 <pre class="r"><code># 加载synbreed包
 is_installed &lt;- require(synbreed)</code></pre>
-<pre><code>## 载入需要的程辑包：synbreed</code></pre>
+<pre><code>## Loading required package: synbreed</code></pre>
 <pre class="r"><code>if (!is_installed) {
   install.packages(&quot;synbreed&quot;)
   library(synbreed)
@@ -174,7 +174,7 @@ M</code></pre>
 ## snp2   -1    1    1    1
 ## snp3    0    1    2    1
 ## snp4    0    1    1    2</code></pre>
-<p>M’M对角线数字为3、-1、0、0，分别表示四个位点纯合基因型的个体数。譬如位点snp1，有3个个体基因型全部为纯合；位点snp2，有1个个体基因型为纯合。</p>
+<p>M’M对角线数字为3、1、2、2，分别表示四个位点纯合基因型的个体数。譬如位点snp1，有3个个体基因型全部为纯合；位点snp2，有1个个体基因型为纯合。</p>
 <p>非对角线元素表示什么意思，还不是很清楚。原英文：off-diagonals measure the number of times alleles at different loci were inherited by the same individual.</p>
 </div>
 <div id="p" class="section level2">
@@ -192,7 +192,7 @@ P</code></pre>
 ## [1,] -0.3333333 -0.3333333 -0.6666667 -0.6666667
 ## [2,] -0.3333333 -0.3333333 -0.6666667 -0.6666667
 ## [3,] -0.3333333 -0.3333333 -0.6666667 -0.6666667</code></pre>
-<p>每一列，及每个位点的等位基因频率都是相同的数字。</p>
+<p>每一列，既每个位点的最小等位基因频率都是相同的数字。</p>
 </div>
 <div id="z" class="section level2">
 <h2>5. 构建Z矩阵</h2>
@@ -223,7 +223,7 @@ Z</code></pre>
 G &lt;- Z %*% t(Z) / d
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:25:07 2018 -->
+<!-- Tue Dec 11 07:51:30 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -281,7 +281,7 @@ Ind3
 </td>
 </tr>
 </table>
-<p>邓飞在他的<a href="http://wap.sciencenet.cn/blog-2577109-1122903.html">科学网博客</a>，利用sommer包对上述结果进行了验证。在此，同样利用sommer包的<code>A.mat()</code>函数进行验证。可以看出，结算结果是一致的。sommer 包现在核心函数已经用C++重写，性能可期待。</p>
+<p>邓飞在他的<a href="http://wap.sciencenet.cn/blog-2577109-1122903.html">科学网博客</a>，利用sommer包对上述结果进行了验证。在此，同样利用sommer包的<code>A.mat()</code>函数进行验证。可以看出，计算结果是一致的。sommer 包现在核心函数已经用C++重写，性能可期待。</p>
 <pre class="r"><code>suppressPackageStartupMessages(is_installed &lt;- require(sommer))
 if (!is_installed) {
   install.packages(&quot;sommer&quot;)
@@ -289,7 +289,7 @@ if (!is_installed) {
 }
 print(xtable(A.mat(M)),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:25:07 2018 -->
+<!-- Tue Dec 11 07:51:30 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -351,9 +351,9 @@ Ind3
 <pre class="r"><code>diag(G) - 1</code></pre>
 <pre><code>##       Ind1       Ind2       Ind3 
 ## -0.2307692 -0.2307692  0.6923077</code></pre>
-<p>前两个个体的近交系数为负值，基因组近交系数跟传统的基于系谱的近交系数并不在一个尺度上。</p>
-<p>个体间的基因组亲缘关系，譬如j、k个体间的亲缘关系，等于<span class="math inline">\(G_{jk}/\sqrt{G_{jj}G_{kk}}\)</span>。</p>
-<p>现在计算Ind1和Ind2个体间的亲缘关系，等于<span class="math inline">\(G_{12}/\sqrt{G_{11}G_{22}}\)</span> = 0.13。</p>
+<p>Ind1和Ind2个体的近交系数为负值，这表明基因组近交系数跟传统的基于系谱的近交系数并不在一个尺度上。</p>
+<p>个体间的基因组亲缘关系，譬如j、k个体间的亲缘关系，= <span class="math inline">\(G_{jk}/\sqrt{G_{jj}G_{kk}}\)</span>。</p>
+<p>现在计算Ind1和Ind2个体间的亲缘关系，= <span class="math inline">\(G_{12}/\sqrt{G_{11}G_{22}}\)</span> = 0.13。</p>
 </div>
 <div class="section level3">
 <h3>6.2 第二种方法</h3>
@@ -367,7 +367,7 @@ D &lt;- diag(D_ii,ncol(M))
 G &lt;- Z %*% D %*% t(Z)
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:25:08 2018 -->
+<!-- Tue Dec 11 07:51:30 2018 -->
 <table border="1">
 <tr>
 <th>

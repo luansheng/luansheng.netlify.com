@@ -31,7 +31,7 @@ tags:
 
 在两个或者多个个体中的一个IBS片段，如果遗传自一个共同的祖先个体，且没有发生重组，那么该片段也是血缘同源的，即IBD。
 
-一段DNA片段，如果是IBD，那么肯定也是IBS；如果片段不是IBD，也有可能是IBS，因为不同个体中发生了相同的突变，或者重组没有改变片段等原因所致。
+一段DNA，如果是IBD，那么肯定也是IBS；如果片段不是IBD，也有可能是IBS，因为不同个体中发生了相同的突变，或者重组没有改变片段等原因所致。
 
 关于IBD和IBS的定义，参见[WIKIPEDIA](https://en.wikipedia.org/wiki/Identity_by_descent)。
 
@@ -112,7 +112,7 @@ MM'对角线数字为2、2、4，分别表示三个个体基因型为纯合的�
 t(M) %*% M
 ```
 
-M'M对角线数字为3、-1、0、0，分别表示四个位点纯合基因型的个体数。譬如位点snp1，有3个个体基因型全部为纯合；位点snp2，有1个个体基因型为纯合。
+M'M对角线数字为3、1、2、2，分别表示四个位点纯合基因型的个体数。譬如位点snp1，有3个个体基因型全部为纯合；位点snp2，有1个个体基因型为纯合。
 
 非对角线元素表示什么意思，还不是很清楚。原英文：off-diagonals measure the number of times alleles at different loci were inherited by the same individual.
 
@@ -133,7 +133,7 @@ P <- p_matrix
 P
 ```
 
-每一列，及每个位点的等位基因频率都是相同的数字。
+每一列，既每个位点的最小等位基因频率都是相同的数字。
 
 ## 5. 构建Z矩阵
 
@@ -169,7 +169,7 @@ G <- Z %*% t(Z) / d
 print(xtable(G),type="html")
 ```
 
-邓飞在他的[科学网博客](http://wap.sciencenet.cn/blog-2577109-1122903.html)，利用sommer包对上述结果进行了验证。在此，同样利用sommer包的` A.mat()`函数进行验证。可以看出，结算结果是一致的。sommer 包现在核心函数已经用C++重写，性能可期待。
+邓飞在他的[科学网博客](http://wap.sciencenet.cn/blog-2577109-1122903.html)，利用sommer包对上述结果进行了验证。在此，同样利用sommer包的` A.mat()`函数进行验证。可以看出，计算结果是一致的。sommer 包现在核心函数已经用C++重写，性能可期待。
 
 ```{r sommer, results="asis"}
 suppressPackageStartupMessages(is_installed <- require(sommer))
@@ -186,11 +186,11 @@ print(xtable(A.mat(M)),type="html")
 diag(G) - 1
 ```
 
-前两个个体的近交系数为负值，基因组近交系数跟传统的基于系谱的近交系数并不在一个尺度上。
+Ind1和Ind2个体的近交系数为负值，这表明基因组近交系数跟传统的基于系谱的近交系数并不在一个尺度上。
 
-个体间的基因组亲缘关系，譬如j、k个体间的亲缘关系，等于$G_{jk}/\sqrt{G_{jj}G_{kk}}$。
+个体间的基因组亲缘关系，譬如j、k个体间的亲缘关系，= $G_{jk}/\sqrt{G_{jj}G_{kk}}$。
 
-现在计算Ind1和Ind2个体间的亲缘关系，等于$G_{12}/\sqrt{G_{11}G_{22}}$ = `r G[1,2]/(G[1,1]*G[2,2])`。
+现在计算Ind1和Ind2个体间的亲缘关系，= $G_{12}/\sqrt{G_{11}G_{22}}$ = `r G[1,2]/(G[1,1]*G[2,2])`。
 
 ### 6.2 第二种方法
 
