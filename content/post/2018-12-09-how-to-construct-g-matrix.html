@@ -56,7 +56,7 @@ genotypes &lt;-
   )
 print(xtable(genotypes),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:17:41 2018 -->
+<!-- Mon Dec 10 16:25:03 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -144,36 +144,36 @@ genotypes_gp &lt;- create.gpData(geno = genotypes)
 # codeGeno默认计算MAF等位基因的个数
 M &lt;- codeGeno(genotypes_gp,reference.allele = &quot;minor&quot;)$geno
 M</code></pre>
-<pre><code> snp1 snp2 snp3 snp4</code></pre>
-<p>Ind1 0 1 0 1
-Ind2 0 1 1 0
-Ind3 2 0 0 0
-为了便于计算，通常会将M矩阵减1，每个位点等位基因含量变为-1、0、1三种形式。</p>
+<pre><code>##      snp1 snp2 snp3 snp4
+## Ind1    0    1    0    1
+## Ind2    0    1    1    0
+## Ind3    2    0    0    0</code></pre>
+<p>为了便于计算，通常会将M矩阵减1，每个位点等位基因含量变为-1、0、1三种形式。</p>
 <pre class="r"><code>M &lt;-  M - 1 
 M</code></pre>
-<pre><code> snp1 snp2 snp3 snp4</code></pre>
-<p>Ind1 -1 0 -1 0
-Ind2 -1 0 0 -1
-Ind3 1 -1 -1 -1</p>
+<pre><code>##      snp1 snp2 snp3 snp4
+## Ind1   -1    0   -1    0
+## Ind2   -1    0    0   -1
+## Ind3    1   -1   -1   -1</code></pre>
 </div>
 <div id="mm" class="section level2">
 <h2>2. MM’矩阵</h2>
 <pre class="r"><code>M %*% t(M)</code></pre>
-<pre><code> Ind1 Ind2 Ind3</code></pre>
-<p>Ind1 2 1 0
-Ind2 1 2 0
-Ind3 0 0 4</p>
+<pre><code>##      Ind1 Ind2 Ind3
+## Ind1    2    1    0
+## Ind2    1    2    0
+## Ind3    0    0    4</code></pre>
 <p>MM’对角线数字为2、2、4，分别表示三个个体基因型为纯合的位点数。譬如Ind1，四个位点中有两个位点的基因型为纯合类型（AA和GG），而Ind3个体四个位点基因型全部为纯合类型。</p>
 <p>非对角线元素，表示亲缘个体间共享的等位基因数。原英文：off-diagonals measure the number of alleles shared by relatives，不是很理解。</p>
 </div>
 <div id="mm-1" class="section level2">
 <h2>3. M’M矩阵</h2>
 <pre class="r"><code>t(M) %*% M</code></pre>
-<pre><code> snp1 snp2 snp3 snp4</code></pre>
-<p>snp1 3 -1 0 0
-snp2 -1 1 1 1
-snp3 0 1 2 1
-snp4 0 1 1 2</p>
+<pre><code>##      snp1 snp2 snp3 snp4
+## snp1    3   -1    0    0
+## snp2   -1    1    1    1
+## snp3    0    1    2    1
+## snp4    0    1    1    2</code></pre>
 <p>M’M对角线数字为3、-1、0、0，分别表示四个位点纯合基因型的个体数。譬如位点snp1，有3个个体基因型全部为纯合；位点snp2，有1个个体基因型为纯合。</p>
 <p>非对角线元素表示什么意思，还不是很清楚。原英文：off-diagonals measure the number of times alleles at different loci were inherited by the same individual.</p>
 </div>
@@ -206,10 +206,10 @@ P</code></pre>
 </ul>
 <pre class="r"><code>Z &lt;-  M - P
 Z</code></pre>
-<pre><code>       snp1       snp2       snp3       snp4</code></pre>
-<p>Ind1 -0.6666667 0.3333333 -0.3333333 0.6666667
-Ind2 -0.6666667 0.3333333 0.6666667 -0.3333333
-Ind3 1.3333333 -0.6666667 -0.3333333 -0.3333333</p>
+<pre><code>##            snp1       snp2       snp3       snp4
+## Ind1 -0.6666667  0.3333333 -0.3333333  0.6666667
+## Ind2 -0.6666667  0.3333333  0.6666667 -0.3333333
+## Ind3  1.3333333 -0.6666667 -0.3333333 -0.3333333</code></pre>
 </div>
 <div id="g" class="section level2">
 <h2>6. 构建G矩阵</h2>
@@ -223,7 +223,7 @@ Ind3 1.3333333 -0.6666667 -0.3333333 -0.3333333</p>
 G &lt;- Z %*% t(Z) / d
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:17:44 2018 -->
+<!-- Mon Dec 10 16:25:07 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -289,7 +289,7 @@ if (!is_installed) {
 }
 print(xtable(A.mat(M)),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:17:45 2018 -->
+<!-- Mon Dec 10 16:25:07 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -367,7 +367,7 @@ D &lt;- diag(D_ii,ncol(M))
 G &lt;- Z %*% D %*% t(Z)
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Mon Dec 10 16:17:45 2018 -->
+<!-- Mon Dec 10 16:25:08 2018 -->
 <table border="1">
 <tr>
 <th>

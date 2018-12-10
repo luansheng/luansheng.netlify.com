@@ -73,7 +73,7 @@ print(xtable(genotypes),type="html")
 把基因型矩阵转换为基因含量矩阵，具体参数用基因型中最小频率等位基因的个数表示，即0、1、2。因此我们称这个矩阵为MAF矩阵。
 
 转换用到了synbreed包中的codeGeno函数。
-```{r m_matrix, results="asis"}
+```{r m_matrix}
 # 加载synbreed包
 is_installed <- require(synbreed)
 if (!is_installed) {
@@ -91,14 +91,14 @@ M <- codeGeno(genotypes_gp,reference.allele = "minor")$geno
 M
 ```
 为了便于计算，通常会将M矩阵减1，每个位点等位基因含量变为-1、0、1三种形式。
-```{r M_1, results="asis"}
+```{r M_1}
 M <-  M - 1 
 M
 ```
 
 ## 2. MM'矩阵
 
-```{r MtM, results="asis"}
+```{r MtM}
 M %*% t(M)
 ```
 
@@ -108,7 +108,7 @@ MM'对角线数字为2、2、4，分别表示三个个体基因型为纯合的�
 
 ## 3. M'M矩阵
 
-```{r tMM, results="asis"}
+```{r tMM}
 t(M) %*% M
 ```
 
@@ -147,7 +147,7 @@ Z矩阵实际上是中心化后的M矩阵。
 * The genomic inbreeding coefficient is greater if the individual is homozygous for rare alleles than if homozygous for common alleles.
 
 
-```{r Z, results="asis"}
+```{r Z}
 Z <-  M - P
 Z
 ```
