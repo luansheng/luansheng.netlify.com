@@ -50,8 +50,14 @@ M矩阵是一个n×m矩阵，n表示个体数（the number of individuals），m
 譬如有3个二倍体个体，4个SNP位点。对于每个位点，小写等位基因表示其出现频率最低。
 
 
-```{r}
+```{r setup, results="asis"}
 rm(list=ls())
+# 加载synbreed包
+is_installed <- require(xtable)
+if (!is_installed) {
+  install.packages("xtable")
+  library(xtable)
+}
 genotypes <-
   data.frame(
   snp1 = c("AA", "AA", "tt"),
@@ -61,13 +67,13 @@ genotypes <-
   row.names = c("Ind1", "Ind2", "Ind3"),
   stringsAsFactors = FALSE
   )
-genotypes
+print(xtable(genotypes),type="html")
 ```
 
 把基因型矩阵转换为基因含量矩阵，具体参数用基因型中最小频率等位基因的个数表示，即0、1、2。因此我们称这个矩阵为MAF矩阵。
 
 转换用到了synbreed包中的codeGeno函数。
-```{r}
+```{r m_matrix, results="asis"}
 # 加载synbreed包
 is_installed <- require(synbreed)
 if (!is_installed) {
@@ -82,18 +88,18 @@ genotypes <- apply(genotypes, 2, function(x) toupper(x))
 genotypes_gp <- create.gpData(geno = genotypes)
 # codeGeno默认计算MAF等位基因的个数
 M <- codeGeno(genotypes_gp,reference.allele = "minor")$geno
-M
+print(xtable(M),type="html")
 ```
 为了便于计算，通常会将M矩阵减1，每个位点等位基因含量变为-1、0、1三种形式。
-```{r}
+```{r M_1, results="asis"}
 M <-  M - 1 
-M
+print(xtable(M),type="html")
 ```
 
 ## 2. MM'矩阵
 
-```{r}
-M %*% t(M)
+```{r MtM, results="asis"}
+print(xtable(M %*% t(M)),type="html")
 ```
 
 MM'对角线数字为2、2、4，分别表示三个个体基因型为纯合的位点数。譬如Ind1，四个位点中有两个位点的基因型为纯合类型（AA和GG），而Ind3个体四个位点基因型全部为纯合类型。
@@ -102,8 +108,8 @@ MM'对角线数字为2、2、4，分别表示三个个体基因型为纯合的�
 
 ## 3. M'M矩阵
 
-```{r}
-t(M) %*% M
+```{r tMM, results="asis"}
+print(xtable(t(M) %*% M),type="html")
 ```
 
 M'M对角线数字为3、-1、0、0，分别表示四个位点纯合基因型的个体数。譬如位点snp1，有3个个体基因型全部为纯合；位点snp2，有1个个体基因型为纯合。
@@ -141,9 +147,9 @@ Z矩阵实际上是中心化后的M矩阵。
 * The genomic inbreeding coefficient is greater if the individual is homozygous for rare alleles than if homozygous for common alleles.
 
 
-```{r}
+```{r Z, results="asis"}
 Z <-  M - P
-Z
+print(xtable(Z,align = "lrrrr"),type="html")
 ```
 
 ## 6. 构建G矩阵
@@ -157,10 +163,10 @@ $$G = \frac{ZZ'}{2\sum{p_{i}(1-p_{i})}}$$
 Z为SNP标记的设计矩阵；公式中，$p_{i}$为每个位点的最小等位基因频率。
 公式中分母部分，是为了使G矩阵与A矩阵的尺度相一致。$\sum{p_{i}(1-p_{i})}$ scales G to be analogous to the numerator relationship matrix A.
 
-```{r}
+```{r output_G, results='asis'}
 d <- 2*sum(p_lower*(1 - p_lower))
 G <- Z %*% t(Z) / d
-G
+print(xtable(G),type="html")
 ```
 
 邓飞在他的[科学网博客](http://wap.sciencenet.cn/blog-2577109-1122903.html)，利用sommer包对上述结果进行了验证。在此，同样利用sommer包的` A.mat()`函数进行验证。可以看出，结算结果是一致的。sommer 包现在核心函数已经用C++重写，性能可期待。

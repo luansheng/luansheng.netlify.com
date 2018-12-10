@@ -38,6 +38,13 @@ tags:
 <p>M矩阵是一个n×m矩阵，n表示个体数（the number of individuals），m表示位点数（the number of loci）。</p>
 <p>譬如有3个二倍体个体，4个SNP位点。对于每个位点，小写等位基因表示其出现频率最低。</p>
 <pre class="r"><code>rm(list=ls())
+# 加载synbreed包
+is_installed &lt;- require(xtable)</code></pre>
+<pre><code>## 载入需要的程辑包：xtable</code></pre>
+<pre class="r"><code>if (!is_installed) {
+  install.packages(&quot;xtable&quot;)
+  library(xtable)
+}
 genotypes &lt;-
   data.frame(
   snp1 = c(&quot;AA&quot;, &quot;AA&quot;, &quot;tt&quot;),
@@ -47,11 +54,78 @@ genotypes &lt;-
   row.names = c(&quot;Ind1&quot;, &quot;Ind2&quot;, &quot;Ind3&quot;),
   stringsAsFactors = FALSE
   )
-genotypes</code></pre>
-<pre><code>##      snp1 snp2 snp3 snp4
-## Ind1   AA   Ct   GG   Ag
-## Ind2   AA   Ct   Ga   AA
-## Ind3   tt   CC   GG   AA</code></pre>
+print(xtable(genotypes),type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
+<!-- Mon Dec 10 14:32:43 2018 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+snp1
+</th>
+<th>
+snp2
+</th>
+<th>
+snp3
+</th>
+<th>
+snp4
+</th>
+</tr>
+<tr>
+<td align="right">
+Ind1
+</td>
+<td>
+AA
+</td>
+<td>
+Ct
+</td>
+<td>
+GG
+</td>
+<td>
+Ag
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind2
+</td>
+<td>
+AA
+</td>
+<td>
+Ct
+</td>
+<td>
+Ga
+</td>
+<td>
+AA
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind3
+</td>
+<td>
+tt
+</td>
+<td>
+CC
+</td>
+<td>
+GG
+</td>
+<td>
+AA
+</td>
+</tr>
+</table>
 <p>把基因型矩阵转换为基因含量矩阵，具体参数用基因型中最小频率等位基因的个数表示，即0、1、2。因此我们称这个矩阵为MAF矩阵。</p>
 <p>转换用到了synbreed包中的codeGeno函数。</p>
 <pre class="r"><code># 加载synbreed包
@@ -69,37 +143,309 @@ genotypes &lt;- apply(genotypes, 2, function(x) toupper(x))
 genotypes_gp &lt;- create.gpData(geno = genotypes)
 # codeGeno默认计算MAF等位基因的个数
 M &lt;- codeGeno(genotypes_gp,reference.allele = &quot;minor&quot;)$geno
-M</code></pre>
-<pre><code>##      snp1 snp2 snp3 snp4
-## Ind1    0    1    0    1
-## Ind2    0    1    1    0
-## Ind3    2    0    0    0</code></pre>
+print(xtable(M),type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
+<!-- Mon Dec 10 14:32:45 2018 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+snp1
+</th>
+<th>
+snp2
+</th>
+<th>
+snp3
+</th>
+<th>
+snp4
+</th>
+</tr>
+<tr>
+<td align="right">
+Ind1
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+1.00
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind2
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind3
+</td>
+<td align="right">
+2.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+</table>
 <p>为了便于计算，通常会将M矩阵减1，每个位点等位基因含量变为-1、0、1三种形式。</p>
 <pre class="r"><code>M &lt;-  M - 1 
-M</code></pre>
-<pre><code>##      snp1 snp2 snp3 snp4
-## Ind1   -1    0   -1    0
-## Ind2   -1    0    0   -1
-## Ind3    1   -1   -1   -1</code></pre>
+print(xtable(M),type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
+<!-- Mon Dec 10 14:32:45 2018 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+snp1
+</th>
+<th>
+snp2
+</th>
+<th>
+snp3
+</th>
+<th>
+snp4
+</th>
+</tr>
+<tr>
+<td align="right">
+Ind1
+</td>
+<td align="right">
+-1.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+-1.00
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind2
+</td>
+<td align="right">
+-1.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+-1.00
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind3
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+-1.00
+</td>
+<td align="right">
+-1.00
+</td>
+<td align="right">
+-1.00
+</td>
+</tr>
+</table>
 </div>
 <div id="mm" class="section level2">
 <h2>2. MM’矩阵</h2>
-<pre class="r"><code>M %*% t(M)</code></pre>
-<pre><code>##      Ind1 Ind2 Ind3
-## Ind1    2    1    0
-## Ind2    1    2    0
-## Ind3    0    0    4</code></pre>
+<pre class="r"><code>print(xtable(M %*% t(M)),type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
+<!-- Mon Dec 10 14:32:45 2018 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+Ind1
+</th>
+<th>
+Ind2
+</th>
+<th>
+Ind3
+</th>
+</tr>
+<tr>
+<td align="right">
+Ind1
+</td>
+<td align="right">
+2.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind2
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+2.00
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind3
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+4.00
+</td>
+</tr>
+</table>
 <p>MM’对角线数字为2、2、4，分别表示三个个体基因型为纯合的位点数。譬如Ind1，四个位点中有两个位点的基因型为纯合类型（AA和GG），而Ind3个体四个位点基因型全部为纯合类型。</p>
 <p>非对角线元素，表示亲缘个体间共享的等位基因数。原英文：off-diagonals measure the number of alleles shared by relatives，不是很理解。</p>
 </div>
 <div id="mm-1" class="section level2">
 <h2>3. M’M矩阵</h2>
-<pre class="r"><code>t(M) %*% M</code></pre>
-<pre><code>##      snp1 snp2 snp3 snp4
-## snp1    3   -1    0    0
-## snp2   -1    1    1    1
-## snp3    0    1    2    1
-## snp4    0    1    1    2</code></pre>
+<pre class="r"><code>print(xtable(t(M) %*% M),type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
+<!-- Mon Dec 10 14:32:45 2018 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+snp1
+</th>
+<th>
+snp2
+</th>
+<th>
+snp3
+</th>
+<th>
+snp4
+</th>
+</tr>
+<tr>
+<td align="right">
+snp1
+</td>
+<td align="right">
+3.00
+</td>
+<td align="right">
+-1.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td align="right">
+snp2
+</td>
+<td align="right">
+-1.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+1.00
+</td>
+</tr>
+<tr>
+<td align="right">
+snp3
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+2.00
+</td>
+<td align="right">
+1.00
+</td>
+</tr>
+<tr>
+<td align="right">
+snp4
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+1.00
+</td>
+<td align="right">
+2.00
+</td>
+</tr>
+</table>
 <p>M’M对角线数字为3、-1、0、0，分别表示四个位点纯合基因型的个体数。譬如位点snp1，有3个个体基因型全部为纯合；位点snp2，有1个个体基因型为纯合。</p>
 <p>非对角线元素表示什么意思，还不是很清楚。原英文：off-diagonals measure the number of times alleles at different loci were inherited by the same individual.</p>
 </div>
@@ -131,11 +477,78 @@ P</code></pre>
 <li>The genomic inbreeding coefficient is greater if the individual is homozygous for rare alleles than if homozygous for common alleles.</li>
 </ul>
 <pre class="r"><code>Z &lt;-  M - P
-Z</code></pre>
-<pre><code>##            snp1       snp2       snp3       snp4
-## Ind1 -0.6666667  0.3333333 -0.3333333  0.6666667
-## Ind2 -0.6666667  0.3333333  0.6666667 -0.3333333
-## Ind3  1.3333333 -0.6666667 -0.3333333 -0.3333333</code></pre>
+print(xtable(Z,align = &quot;lrrrr&quot;),type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
+<!-- Mon Dec 10 14:32:45 2018 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+snp1
+</th>
+<th>
+snp2
+</th>
+<th>
+snp3
+</th>
+<th>
+snp4
+</th>
+</tr>
+<tr>
+<td>
+Ind1
+</td>
+<td align="right">
+-0.67
+</td>
+<td align="right">
+0.33
+</td>
+<td align="right">
+-0.33
+</td>
+<td align="right">
+0.67
+</td>
+</tr>
+<tr>
+<td>
+Ind2
+</td>
+<td align="right">
+-0.67
+</td>
+<td align="right">
+0.33
+</td>
+<td align="right">
+0.67
+</td>
+<td align="right">
+-0.33
+</td>
+</tr>
+<tr>
+<td>
+Ind3
+</td>
+<td align="right">
+1.33
+</td>
+<td align="right">
+-0.67
+</td>
+<td align="right">
+-0.33
+</td>
+<td align="right">
+-0.33
+</td>
+</tr>
+</table>
 </div>
 <div id="g" class="section level2">
 <h2>6. 构建G矩阵</h2>
@@ -147,11 +560,66 @@ Z</code></pre>
 公式中分母部分，是为了使G矩阵与A矩阵的尺度相一致。<span class="math inline">\(\sum{p_{i}(1-p_{i})}\)</span> scales G to be analogous to the numerator relationship matrix A.</p>
 <pre class="r"><code>d &lt;- 2*sum(p_lower*(1 - p_lower))
 G &lt;- Z %*% t(Z) / d
-G</code></pre>
-<pre><code>##             Ind1        Ind2       Ind3
-## Ind1  0.76923077  0.07692308 -0.8461538
-## Ind2  0.07692308  0.76923077 -0.8461538
-## Ind3 -0.84615385 -0.84615385  1.6923077</code></pre>
+print(xtable(G),type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
+<!-- Mon Dec 10 14:32:45 2018 -->
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+Ind1
+</th>
+<th>
+Ind2
+</th>
+<th>
+Ind3
+</th>
+</tr>
+<tr>
+<td align="right">
+Ind1
+</td>
+<td align="right">
+0.77
+</td>
+<td align="right">
+0.08
+</td>
+<td align="right">
+-0.85
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind2
+</td>
+<td align="right">
+0.08
+</td>
+<td align="right">
+0.77
+</td>
+<td align="right">
+-0.85
+</td>
+</tr>
+<tr>
+<td align="right">
+Ind3
+</td>
+<td align="right">
+-0.85
+</td>
+<td align="right">
+-0.85
+</td>
+<td align="right">
+1.69
+</td>
+</tr>
+</table>
 <p>邓飞在他的<a href="http://wap.sciencenet.cn/blog-2577109-1122903.html">科学网博客</a>，利用sommer包对上述结果进行了验证。在此，同样利用sommer包的<code>A.mat()</code>函数进行验证。可以看出，结算结果是一致的。sommer 包现在核心函数已经用C++重写，性能可期待。</p>
 <pre class="r"><code>suppressPackageStartupMessages(is_installed &lt;- require(sommer))
 if (!is_installed) {
