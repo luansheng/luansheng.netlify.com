@@ -16,7 +16,7 @@ tags:
 <p>自从2005年开始学习水产动物选择育种知识以来，采取囫囵吞枣模式，虽然对于REML算法和BLUP算法的细节知识仍然一知半解，好歹相关的软件如ASReml、R等可以以较为熟练的使用，对于选择育种体系的理解也逐渐深入，常规的遗传评估工作算是可以胜任。</p>
 <p>全基因组选择方法建立以来，尽管迅速在奶牛、猪等大动物上展现了优越的性能，然而对于虾等个体小、世代周期短的动物，如何应用，仍然是一个难题，也是我正在努力研究的方向。</p>
 <p>然而，基于高通量SNP标记信息，获得的亲缘关系更加准确，这一结论已经毋容置疑。</p>
-<p>因此，自这个blog开始，将逐渐学习、并记录基于SNP标记的基因组选择评估方法，逐渐更新自己的知识体系。随着年龄的增大，知识体系的更新会慢很多，且行且记吧。</p>
+<p>因此，自这个blog开始，将逐渐学习并记录基于SNP标记的基因组选择评估方法，逐渐更新自己的知识体系。随着年龄的增大，知识体系的更新会慢很多，且行且记吧。</p>
 <p>计算G矩阵的方法有很多种，目前引用较多的是Vanraden于2008年发表在Journal of Dairy Science上的文章“<a href="#1">Efficient methods to compute genomic predictions</a>”中所建立的方法，目前该论文已经被引用了超过1500次。</p>
 <p>一些背景知识：</p>
 <ul>
@@ -56,7 +56,7 @@ genotypes &lt;-
   )
 print(xtable(genotypes),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Tue Dec 11 07:51:29 2018 -->
+<!-- Tue Dec 11 08:09:51 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -223,7 +223,7 @@ Z</code></pre>
 G &lt;- Z %*% t(Z) / d
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Tue Dec 11 07:51:30 2018 -->
+<!-- Tue Dec 11 08:09:53 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -289,7 +289,7 @@ if (!is_installed) {
 }
 print(xtable(A.mat(M)),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Tue Dec 11 07:51:30 2018 -->
+<!-- Tue Dec 11 08:09:53 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -367,7 +367,7 @@ D &lt;- diag(D_ii,ncol(M))
 G &lt;- Z %*% D %*% t(Z)
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Tue Dec 11 07:51:30 2018 -->
+<!-- Tue Dec 11 08:09:53 2018 -->
 <table border="1">
 <tr>
 <th>
