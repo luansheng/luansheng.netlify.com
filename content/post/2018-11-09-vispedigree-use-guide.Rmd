@@ -6,6 +6,7 @@ slug: vispedigree-use-guide
 categories:
   - visualization
 tags:
+  - rblog
   - R
   - Data.table
   - igraph
