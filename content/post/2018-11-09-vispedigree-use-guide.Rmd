@@ -292,5 +292,3 @@ The below codes will show the composition of the parents of 106 families born in
   )
 ```
 In the above figure, 106 families are shown at the bottom, the parents are shown in the middle, and the grandparents are shown at the top. It can be seen that the parents are composed of `r length(sire_label[!is.na(sire_label)])` sires and `r length(dam_label[!is.na(dam_label)])` dams. The parents are from `r length(fullsib_family_label)` full-sib families in the generation of grandparent. About `r family_size$N[1]+family_size$N[2]` parents are from two full-sib families because the optimum contribution theory was used, and account for `r round((family_size$N[1]+family_size$N[2])/sum(family_size$N),4)*100`% of the total number of parents.
-
-ps: This blog is posted to [R-Bloggers.com](https://www.r-bloggers.com).
