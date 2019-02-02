@@ -46,7 +46,11 @@ print(bin_str)</code></pre>
 <p class="caption">图1 原码、反码和补码示例1</p>
 </div>
 <p>计算机在计算时，通常只会执行加法操作，减法通常也会转换为加法，而且为了加快计算速度，符号位也需要直接参与计算。从上图中可以看到，如果符号位直接参与计算，利用原码得到的计算结果是错误的。而利用反码，会得到-0，这意味着0有正负两种形式。而利用补码，可以得到正确的值。</p>
-<p>继续看下边的例子，有一个更深刻的印象： <img src="/post/images/bincalc2.png" alt="图2 原码、反码和补码示例2" /></p>
+<p>继续看下边的例子，有一个更深刻的印象：</p>
+<div class="figure">
+<img src="/post/images/bincalc2.png" alt="图2 原码、反码和补码示例2" />
+<p class="caption">图2 原码、反码和补码示例2</p>
+</div>
 <p>进一步的解释，参见下述链接：<a href="https://blog.csdn.net/wo17fang/article/details/52241682" class="uri">https://blog.csdn.net/wo17fang/article/details/52241682</a>。</p>
 <p>讨论一个问题： 对于8个bit位，如果拿出第8位，用来表示正负号，那么实际上可用的位数只有7位，用来表示的最大正整数为“1111111”，十进制为127：</p>
 <pre class="r"><code>print(bin2dec(&quot;1111111&quot;))</code></pre>
