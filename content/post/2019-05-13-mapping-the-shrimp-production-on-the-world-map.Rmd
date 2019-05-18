@@ -1,0 +1,241 @@
+---
+title: Mapping the shrimp production on the world map
+author: Sheng Luan
+date: '2019-05-13'
+slug: mapping-the-shrimp-production-on-the-world-map
+categories:
+  - 可视化
+tags:
+  - ggplot2
+  - map
+header:
+  caption: ''
+  image: ''
+  preview: yes
+---
+
+最近，Boss交给了一个任务，把各国凡纳滨对虾的产量在世界地区上标注一下。很有挑战性！
+
+之前看过几个blog，印象中有不少包可以完成这个任务。
+
+但最后发现，还是ggplot2包比较好用。为了画地图，用到的包主要有：
+* maps 提供世界地图数据
+* ggrepel 重拍地图上的国家名称，消除重叠
+* showtext和sysfonts 在图上可以使用中文字体如黑体
+* data.table 数据清洗
+
+```{r setup, include=FALSE}
+rm(list=ls())
+library(data.table)
+library(ggrepel)
+library(showtext)
+library(sysfonts)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## 1. 读取全球南美白对虾产量
+从[FAO](http://www.fao.org/fishery/statistics/global-aquaculture-production/zh)下载全球水产产量数据。
+
+在TS_FI_AQUACULTURE.csv在文件中，南美白对虾的3位代码是"PNV"。
+
+统计2016年全球各个国家南美白对虾养殖产量。
+
+由于在上述文件中，国家也是用代码表示。
+
+因此从CL_FI_COUNTRY_GROUPS.csv文件中读取国家信息。
+
+其中Name_En和Name_Cn分别表示英文和中文国家名称
+
+```{r read_shrimp_production}
+world_aquaculture_production_dt <-
+  fread(
+    input = "datasets/Aquaculture_2018.1.2/TS_FI_AQUACULTURE.csv",
+    header = TRUE,
+    stringsAsFactors = FALSE,
+    encoding = "UTF-8"
+  )
+species_3alpha_code <- "PNV"
+world_PNV_production_dt <-
+  world_aquaculture_production_dt[SPECIES %chin% species_3alpha_code]
+world_PNV_production_2016_dt <-
+  world_PNV_production_dt[YEAR == 2016]
+#读取国家信息
+country_group_dt <-
+  fread(
+    input = "datasets/Aquaculture_2018.1.2/CL_FI_COUNTRY_GROUPS.csv",
+    header = TRUE,
+    stringsAsFactors = FALSE,
+    encoding = "UTF-8"
+  )
+
+world_PNV_production_2016_country_info_dt <-
+  merge(
+    world_PNV_production_2016_dt,
+    country_group_dt[, c("UN_Code",
+                         "Identifier",
+                         "ISO2_Code",
+                         "ISO3_Code",
+                         "Name_En",
+                         "Name_Cn")],
+    by.x = c("COUNTRY"),
+    by.y = c("UN_Code")
+  )
+world_PNV_production_2016_country_info_dt[1:5]
+# 累加每个国家的总产量，凡纳滨对虾可在不同环境下养殖，如海、淡水、半咸水等
+PNV_production_2016_per_country_dt <-
+  world_PNV_production_2016_country_info_dt[, .(Production = sum(QUANTITY)), keyby =
+                                              c("Name_En")]
+#按照产量降序排列
+setorder(PNV_production_2016_per_country_dt,-Production)
+setnames(PNV_production_2016_per_country_dt,
+         c("Name_En"),
+         c("Country"))
+```
+
+## 2.绘制地图
+
+### 2.1 获取地图数据
+
+map_data()函数从maps包中获取地区数据。
+
+其中long和lat分别表示经、纬度。
+
+region与国家对应。group这一列很重要，在绘图时需要指定。
+```{r get_world_map_data}
+#获取世界地图数据
+map_world_dt <- as.data.table(map_data('world'))
+map_world_dt[1:20]
+```
+subregion貌似与州或者省份对应。我们来看一下美国的各个州。貌似并没有把50个州全部标注出来。
+
+```{r clean_map_data}
+unique(map_world_dt[region %chin% c("USA")]$subregion)
+#把台湾明确为台湾省
+map_world_dt[region %chin% c("Taiwan"), region := c("Taiwan Province of China")]
+#因为凡纳滨对虾不可能在南极洲生存，直接在地图数据中剔除南极洲，不绘制.
+map_world_dt <- map_world_dt[!region %chin% c("Antarctica")]
+#美国阿拉斯加靠近北极，不可能养凡纳滨对虾，这部分地区单独设置为一个国家，
+#这样绘制美国地图时，不包括该地区
+map_world_dt[subregion %chin% c("Alaska"), region:= c("USANoDraw")]
+```
+
+
+### 2.2 统一FAO数据与maps包中的国家名称
+
+从FAO下载的数据，国家命名跟maps包中的国家命名可能会不一致。
+
+需要找出二者间国家名称的差异，并把FAO数据中国家名称修改为maps包国家名称。
+
+
+```{r modify_country_name}
+#查找名称不一致的国家
+FAO_nomatched_country_name_v <-
+  PNV_production_2016_per_country_dt$Country[!(PNV_production_2016_per_country_dt$Country %in% unique(map_world_dt$region))]
+FAO_nomatched_country_name_v
+
+#根据maps包中国家名称，重新对相应国家命名
+maps_matched_country_name_v <-
+  c(
+    "Vietnam",
+    "Venezuela",
+    "Iran",
+    "Korea",
+    "USA",
+    "Northern Mariana Islands",
+    "Saint Kitts"
+  )
+PNV_production_2016_per_country_dt[Country %chin% FAO_nomatched_country_name_v, 
+                                   Country := maps_matched_country_name_v]
+#把凡纳滨对虾产量数据跟地区数据合并
+map_world_PNV_production_2016_dt <-
+  merge(
+    map_world_dt,
+    PNV_production_2016_per_country_dt,
+    all.x = TRUE,
+    by.x = "region",
+    by.y = "Country"
+  )
+#产量为0的国家设置为NA，这样绘制地图时，这些国家不会上色
+map_world_PNV_production_2016_dt[Production == 0, Production:=NA]
+#计算国家经纬度均值，用于定位国家名称的显示位置
+map_world_PNV_country_position_2016_dt <-
+  map_world_PNV_production_2016_dt[Production > 0, 
+                                   .(MeanLong = mean(long),
+                                     MeanLat = mean(lat),
+                                     group = mean(group)),
+                                   by = c("region")]
+map_world_PNV_country_position_2016_dt[1:5]
+```
+
+### 2.2 绘制凡纳滨对虾世界养殖分布图
+
+地图中使用黑体。因此需要利用showtext包加载黑体文件。
+
+调用ggplot函数和geom_polygon函数来绘制地图。
+
+为了防止国家名称重叠，调用ggrepel包中geom_text_repel()函数优化国家名称在地图中的布局。
+
+生产凡纳滨对虾的国家用金黄色标出来了，给出国家名称，并且加了一个蓝色圆点表示国家位置。
+
+
+
+```{r draw_aquaculture_map, fig.showtext=TRUE, fig.width = 10, fig.width= 9}
+font_add(family = "heiti", regular = "simhei.ttf")
+showtext_auto()
+ggplot(map_world_PNV_production_2016_dt,
+       aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = Production),color="grey50") +
+  #国家绘制为金黄色
+  scale_fill_gradient(
+    low = "#feedd9",  ##f3f8f1 绿色
+    high = "#db9a08",  ##228b22
+    breaks = c(50000, 100000, 200000, 400000, 500000, 1600000),
+    space = "Lab",
+    na.value = "#a9a9a9",
+    guide = "colourbar",
+    aesthetics = "fill"
+  ) +
+  guides(fill = guide_legend(reverse = T)) +
+  labs(
+    fill = "产量(吨)/年",
+    title = "凡纳滨对虾世界养殖分布",
+    subtitle = "主要养殖国家年产量",
+    x = NULL,
+    y = NULL
+  ) +
+  geom_point(aes(x =MeanLong, y= MeanLat),
+             color = "blue", 
+             size = 1.5,
+             data=map_world_PNV_country_position_2016_dt) +
+  geom_text_repel(
+    aes(x = MeanLong, y = MeanLat, label = region),
+    data = map_world_PNV_country_position_2016_dt,
+    size = 8
+    ) +
+  theme(
+    text = element_text(family = "heiti", color = "#000000"),
+    plot.title = element_text(family = "heiti", hjust=0.5, size = 36),
+    plot.subtitle = element_text(family = "heiti", hjust=0.5, size = 28),
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = "#FFFFFF"),
+    plot.background = element_rect(fill = "#FFFFFF"),
+    legend.position = c(0.18, 0.20),
+    legend.background = element_blank(),
+    legend.key = element_blank(),
+    legend.title = element_text(family = "heiti", size = 18),
+    legend.text=element_text(family="heiti", size=18)
+  ) +
+  annotate(
+    geom = 'text',
+      label = '栾生等，2019.\n数据来源：FAO, 2018.  http://www.fao.org/fishery/statistics/global-aquaculture-production/zh',
+    x = 10, y = -55,
+    size = 4,
+    family = 'heiti',
+    color = 'grey50',
+    hjust =  'left'
+)
+```
