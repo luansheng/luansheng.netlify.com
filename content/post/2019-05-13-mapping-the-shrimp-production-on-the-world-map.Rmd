@@ -14,7 +14,7 @@ header:
   preview: yes
 ---
 
-最近，Boss交给了一个任务，把各国凡纳滨对虾的产量在世界地区上标注一下。
+最近，Boss交给了一个任务，把各国凡纳滨对虾的产量在世界地图上标注一下。
 
 对于生成地图还是很有兴趣的。没想到竟然很有挑战性！
 
@@ -111,6 +111,9 @@ map_world_dt[1:20]
 ```
 
 subregion貌似与州或者省份对应。我们来看一下美国的各个州。貌似subregion列并没有包括全部50个州。
+```{r}
+unique(map_world_dt[region %chin% c("USA")]$subregion)
+```
 
 对地图数据进行清洗，主要包括：
 
@@ -119,7 +122,6 @@ subregion貌似与州或者省份对应。我们来看一下美国的各个州�
 * 美国阿拉斯基地区靠近北极圈，温度太低，也不可能养殖凡纳滨对虾。因此在绘制地区时，不把该地区标注为可养殖地区。
 
 ```{r clean_map_data}
-unique(map_world_dt[region %chin% c("USA")]$subregion)
 #把台湾明确为台湾省
 map_world_dt[region %chin% c("Taiwan"), region := c("Taiwan Province of China")]
 #因为凡纳滨对虾不可能在南极洲生存，直接在地图数据中剔除南极洲，不绘制.
@@ -189,6 +191,8 @@ map_world_PNV_country_position_2016_dt[1:5]
 在地图中，颜色的深浅，表示产量的高低。产量越高，颜色越深。
 
 国家名，根据map_world_PNV_country_position_2016_dt数据集中的平均经纬度定位显示，并且加了一个蓝色圆点。
+
+为了正确的画出地图，需要在aes函数中设置**group=group**，这个特别重要。
 
 ```{r draw_aquaculture_map, fig.showtext=TRUE, fig.width = 10, fig.width= 9}
 font_add(family = "heiti", regular = "simhei.ttf")
