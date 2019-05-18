@@ -16,21 +16,20 @@ header:
 
 
 
-<p>最近，Boss交给了一个任务，把各国凡纳滨对虾的产量在世界地区上标注一下。很有挑战性！</p>
+<p>最近，Boss交给了一个任务，把各国凡纳滨对虾的产量在世界地区上标注一下。</p>
+<p>对于生成地图还是很有兴趣的。没想到竟然很有挑战性！</p>
 <p>之前看过几个blog，印象中有不少包可以完成这个任务。</p>
-<p>但最后发现，还是ggplot2包比较好用。为了画地图，用到的包主要有：
-* maps 提供世界地图数据
-* ggrepel 重拍地图上的国家名称，消除重叠
-* showtext和sysfonts 在图上可以使用中文字体如黑体
-* data.table 数据清洗</p>
+<p>但最后发现，还是ggplot2包比较好用。为了画地图，用到的包主要有：</p>
+<ul>
+<li>maps 提供世界地图数据。</li>
+<li>ggrepel 重排地图上的国家名称，消除名称间的重叠现象。</li>
+<li>showtext和sysfonts 确保在生成的地图上可以使用中文字体如黑体。</li>
+<li>data.table 数据清洗，生成符合要求的地图数据集，供ggplot2调用。</li>
+</ul>
 <div id="section" class="section level2">
-<h2>1. 读取全球南美白对虾产量</h2>
-<p>从<a href="http://www.fao.org/fishery/statistics/global-aquaculture-production/zh">FAO</a>下载全球水产产量数据。</p>
-<p>在TS_FI_AQUACULTURE.csv在文件中，南美白对虾的3位代码是“PNV”。</p>
-<p>统计2016年全球各个国家南美白对虾养殖产量。</p>
-<p>由于在上述文件中，国家也是用代码表示。</p>
-<p>因此从CL_FI_COUNTRY_GROUPS.csv文件中读取国家信息。</p>
-<p>其中Name_En和Name_Cn分别表示英文和中文国家名称</p>
+<h2>1. 获取世界各国凡纳滨对虾产量数据</h2>
+<p>从<a href="http://www.fao.org/fishery/statistics/global-aquaculture-production/zh">FAO</a>下载世界各国所有水产养殖种类的产量数据。选择下载csv格式数据集。</p>
+<p>解压缩后，产量数据在TS_FI_AQUACULTURE.csv文件中。凡纳滨对虾的产量数据，可以通过其3位种类代码是“PNV”进行查找。当前可以获得的最新即2016年的产量数据。</p>
 <pre class="r"><code>world_aquaculture_production_dt &lt;-
   fread(
     input = &quot;datasets/Aquaculture_2018.1.2/TS_FI_AQUACULTURE.csv&quot;,
@@ -42,8 +41,10 @@ species_3alpha_code &lt;- &quot;PNV&quot;
 world_PNV_production_dt &lt;-
   world_aquaculture_production_dt[SPECIES %chin% species_3alpha_code]
 world_PNV_production_2016_dt &lt;-
-  world_PNV_production_dt[YEAR == 2016]
-#读取国家信息
+  world_PNV_production_dt[YEAR == 2016]</code></pre>
+<p>凡纳滨对虾在海水、淡水和半咸水中都可以养殖，因此在统计世界各个国家产量时，需要累加在不同养殖环境下的产量。</p>
+<p>由于在TS_FI_AQUACULTURE.csv文件中，国家列（COUNTRY）是用代码表示。因此需要从CL_FI_COUNTRY_GROUPS.csv文件中匹配UN_Code列查询国家名称等信息。其中Name_En和Name_Cn分别表示英文和中文国家名称。</p>
+<pre class="r"><code>#读取国家信息
 country_group_dt &lt;-
   fread(
     input = &quot;datasets/Aquaculture_2018.1.2/CL_FI_COUNTRY_GROUPS.csv&quot;,
@@ -97,9 +98,8 @@ setnames(PNV_production_2016_per_country_dt,
 <h2>2.绘制地图</h2>
 <div id="section-2" class="section level3">
 <h3>2.1 获取地图数据</h3>
-<p>map_data()函数从maps包中获取地区数据。</p>
-<p>其中long和lat分别表示经、纬度。</p>
-<p>region与国家对应。group这一列很重要，在绘图时需要指定。</p>
+<p>利用map_data()函数从maps包中获取地图数据。其中long和lat分别表示经、纬度。</p>
+<p>地图数据中region列与国家对应。group这一列很重要，在绘图时需要指定。</p>
 <pre class="r"><code>#获取世界地图数据
 map_world_dt &lt;- as.data.table(map_data(&#39;world&#39;))
 map_world_dt[1:20]</code></pre>
@@ -124,7 +124,13 @@ map_world_dt[1:20]</code></pre>
 ## 18:  74.37217 37.15771     2    19 Afghanistan      &lt;NA&gt;
 ## 19:  74.37617 37.13735     2    20 Afghanistan      &lt;NA&gt;
 ## 20:  74.49796 37.05722     2    21 Afghanistan      &lt;NA&gt;</code></pre>
-<p>subregion貌似与州或者省份对应。我们来看一下美国的各个州。貌似并没有把50个州全部标注出来。</p>
+<p>subregion貌似与州或者省份对应。我们来看一下美国的各个州。貌似subregion列并没有包括全部50个州。</p>
+<p>对地图数据进行清洗，主要包括：</p>
+<ul>
+<li>将台湾明确为中国的一个省。</li>
+<li>在地图中删除南极洲数据。因为凡纳滨对虾为高温物种，不可能在此养殖。</li>
+<li>美国阿拉斯基地区靠近北极圈，温度太低，也不可能养殖凡纳滨对虾。因此在绘制地区时，不把该地区标注为可养殖地区。</li>
+</ul>
 <pre class="r"><code>unique(map_world_dt[region %chin% c(&quot;USA&quot;)]$subregion)</code></pre>
 <pre><code>##  [1] &quot;Hawaii&quot;              &quot;Florida&quot;             &quot;13&quot;                 
 ##  [4] &quot;16&quot;                  &quot;Texas&quot;               &quot;Louisiana&quot;          
@@ -147,8 +153,9 @@ map_world_dt[subregion %chin% c(&quot;Alaska&quot;), region:= c(&quot;USANoDraw&
 </div>
 <div id="faomaps" class="section level3">
 <h3>2.2 统一FAO数据与maps包中的国家名称</h3>
-<p>从FAO下载的数据，国家命名跟maps包中的国家命名可能会不一致。</p>
-<p>需要找出二者间国家名称的差异，并把FAO数据中国家名称修改为maps包国家名称。</p>
+<p>从FAO下载的数据，部分国家名跟maps包中的国家名不一致。需要找出这些国家，并把FAO数据中国家名称修改为maps包国家名称。</p>
+<p>把凡纳滨对虾产量数据合并到地图数据集中。</p>
+<p>计算每个国家的经纬度均值，生成一个新的数据集，用于在地图中定位国家名字的显示位置。</p>
 <pre class="r"><code>#查找名称不一致的国家
 FAO_nomatched_country_name_v &lt;-
   PNV_production_2016_per_country_dt$Country[!(PNV_production_2016_per_country_dt$Country %in% unique(map_world_dt$region))]
@@ -157,7 +164,7 @@ FAO_nomatched_country_name_v</code></pre>
 ## [3] &quot;Iran (Islamic Rep. of)&quot;   &quot;Korea, Republic of&quot;      
 ## [5] &quot;United States of America&quot; &quot;Northern Mariana Is.&quot;    
 ## [7] &quot;Saint Kitts and Nevis&quot;</code></pre>
-<pre class="r"><code>#根据maps包中国家名称，重新对相应国家命名
+<pre class="r"><code>#根据maps包中的国家名，重新对相应的国家重新命名
 maps_matched_country_name_v &lt;-
   c(
     &quot;Vietnam&quot;,
@@ -170,7 +177,7 @@ maps_matched_country_name_v &lt;-
   )
 PNV_production_2016_per_country_dt[Country %chin% FAO_nomatched_country_name_v, 
                                    Country := maps_matched_country_name_v]
-#把凡纳滨对虾产量数据跟地区数据合并
+#把凡纳滨对虾产量数据跟地图数据合并
 map_world_PNV_production_2016_dt &lt;-
   merge(
     map_world_dt,
@@ -179,7 +186,7 @@ map_world_PNV_production_2016_dt &lt;-
     by.x = &quot;region&quot;,
     by.y = &quot;Country&quot;
   )
-#产量为0的国家设置为NA，这样绘制地图时，这些国家不会上色
+#将产量为0的国家设置为NA，这样绘制地图时，这些国家不会上色
 map_world_PNV_production_2016_dt[Production == 0, Production:=NA]
 #计算国家经纬度均值，用于定位国家名称的显示位置
 map_world_PNV_country_position_2016_dt &lt;-
@@ -198,10 +205,11 @@ map_world_PNV_country_position_2016_dt[1:5]</code></pre>
 </div>
 <div id="section-3" class="section level3">
 <h3>2.2 绘制凡纳滨对虾世界养殖分布图</h3>
-<p>地图中使用黑体。因此需要利用showtext包加载黑体文件。</p>
+<p>地图中的文字使用黑体。因此需要利用showtext包加载黑体文件。</p>
 <p>调用ggplot函数和geom_polygon函数来绘制地图。</p>
-<p>为了防止国家名称重叠，调用ggrepel包中geom_text_repel()函数优化国家名称在地图中的布局。</p>
-<p>生产凡纳滨对虾的国家用金黄色标出来了，给出国家名称，并且加了一个蓝色圆点表示国家位置。</p>
+<p>为了消除可能存在的国家名重叠的问题，调用ggrepel包中geom_text_repel()函数优化国家名在地图中的布局。</p>
+<p>在地图中，颜色的深浅，表示产量的高低。产量越高，颜色越深。</p>
+<p>国家名，根据map_world_PNV_country_position_2016_dt数据集中的平均经纬度定位显示，并且加了一个蓝色圆点。</p>
 <pre class="r"><code>font_add(family = &quot;heiti&quot;, regular = &quot;simhei.ttf&quot;)
 showtext_auto()
 ggplot(map_world_PNV_production_2016_dt,
@@ -209,9 +217,9 @@ ggplot(map_world_PNV_production_2016_dt,
   geom_polygon(aes(fill = Production),color=&quot;grey50&quot;) +
   #国家绘制为金黄色
   scale_fill_gradient(
-    low = &quot;#feedd9&quot;,  ##f3f8f1 绿色
-    high = &quot;#db9a08&quot;,  ##228b22
-    breaks = c(50000, 100000, 200000, 400000, 500000, 1600000),
+    low = &quot;#ffead8&quot;,  ##f3f8f1 绿色
+    high = &quot;#f28500&quot;,  ##228b22
+    breaks = c(5000, 10000, 50000, 250000, 500000, 1600000),
     space = &quot;Lab&quot;,
     na.value = &quot;#a9a9a9&quot;,
     guide = &quot;colourbar&quot;,
