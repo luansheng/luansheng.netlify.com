@@ -35,7 +35,7 @@ tags:
 
 关于IBD和IBS的定义，参见[WIKIPEDIA](https://en.wikipedia.org/wiki/Identity_by_descent)。
 
-个体间的亲缘关系，可以通过以下两种方法估计：
+个体间的亲缘关系(relationship)，可以通过以下两种方法估计：
 
 * 通过系谱进行计算，利用处于IBD状态的等位基因估计个体间的亲缘关系
 * 通过分子标记，利用处于IBS状态的基因估计个体间共享染色体片段的百分比，估计个体间的相似性
@@ -192,11 +192,11 @@ Ind1和Ind2个体的近交系数为负值，这表明基因组近交系数跟传
 
 个体间的基因组亲缘关系，譬如j、k个体间的亲缘关系，= $G_{jk}/\sqrt{G_{jj}G_{kk}}$。
 
-现在计算Ind1和Ind2个体间的亲缘关系，= $G_{12}/\sqrt{G_{11}G_{22}}$ = `r G[1,2]/(G[1,1]*G[2,2])`。
+现在计算Ind1和Ind2个体间的亲缘关系，= $G_{12}/\sqrt{G_{11}G_{22}}$ = `r G[1,2]/(G[1,1]*G[2,2])`。这个系数，跟经典的[Relationship coefficient of Wright （1922）](#2)非常相似。
 
-由于对角线元素一般都在1左右，因此j与k的亲缘（relationship）系数也就基本约等于G矩阵中相对应的值。
+由于对角线元素一般都在1左右，因此j与k的基因组亲缘关系（Genomic relationship）也就基本约等于G矩阵中相对应的值。
 
-因此这里可以G阵看做传统A阵，那么j与k的共亲系数（coancestry）也就是G阵中相对应的亲缘系数的一半。
+因此这里可以G阵看做传统A阵（Additive genetic relationship matrix 或 numerator relationship matrix），那么j与k的共亲系数（coancestry coefficient）也就是G阵中相对应的系数的一半。
 
 ### 6.2 第二种方法
 
@@ -218,3 +218,4 @@ print(xtable(G),type="html")
 参考文献：
 
 <a id="1">Vanraden P M. Efficient methods to compute genomic predictions.[J]. Journal of Dairy Science, 2008, 91(11):4414-4423.</a>
+<a id="2">Wright, S. 1922. Coefficients of inbreeding and relationship. Am.Nat. 56:330–338.</a>

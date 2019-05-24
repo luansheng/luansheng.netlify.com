@@ -1,7 +1,7 @@
 ---
 title: 如何构建G矩阵-基因组亲缘关系矩阵（Genomic relationships matrix）
 author: Sheng Luan
-date: '2019-03-01'
+date: '2019-05-25'
 slug: how-to-construct-g-matrix
 categories:
   - 数量遗传学
@@ -27,7 +27,7 @@ tags:
 <p>在两个或者多个个体中的一个IBS片段，如果遗传自一个共同的祖先个体，且没有发生重组，那么该片段也是血缘同源的，即IBD。</p>
 <p>一段DNA，如果是IBD，那么肯定也是IBS；如果片段不是IBD，也有可能是IBS，因为不同个体中发生了相同的突变，或者重组没有改变片段等原因所致。</p>
 <p>关于IBD和IBS的定义，参见<a href="https://en.wikipedia.org/wiki/Identity_by_descent">WIKIPEDIA</a>。</p>
-<p>个体间的亲缘关系，可以通过以下两种方法估计：</p>
+<p>个体间的亲缘关系(relationship)，可以通过以下两种方法估计：</p>
 <ul>
 <li>通过系谱进行计算，利用处于IBD状态的等位基因估计个体间的亲缘关系</li>
 <li>通过分子标记，利用处于IBS状态的基因估计个体间共享染色体片段的百分比，估计个体间的相似性</li>
@@ -55,8 +55,8 @@ genotypes &lt;-
   stringsAsFactors = FALSE
   )
 print(xtable(genotypes),type=&quot;html&quot;)</code></pre>
-<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Fri Mar 01 08:27:39 2019 -->
+<!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
+<!-- Sat May 25 07:12:28 2019 -->
 <table border="1">
 <tr>
 <th>
@@ -214,7 +214,7 @@ Z</code></pre>
 <div id="g" class="section level2">
 <h2>6. 构建G矩阵</h2>
 <p>构建方法，在文章中提到了3种：</p>
-<div class="section level3">
+<div id="section" class="section level3">
 <h3>6.1 第一种方法：</h3>
 <p><span class="math display">\[G = \frac{ZZ&#39;}{2\sum{p_{i}(1-p_{i})}}\]</span></p>
 <p>Z为SNP标记的设计矩阵；公式中，<span class="math inline">\(p_{i}\)</span>为每个位点的最小等位基因频率。
@@ -222,8 +222,8 @@ Z</code></pre>
 <pre class="r"><code>d &lt;- 2*sum(p_lower*(1 - p_lower))
 G &lt;- Z %*% t(Z) / d
 print(xtable(G),type=&quot;html&quot;)</code></pre>
-<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Fri Mar 01 08:27:41 2019 -->
+<!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
+<!-- Sat May 25 07:12:30 2019 -->
 <table border="1">
 <tr>
 <th>
@@ -288,8 +288,8 @@ if (!is_installed) {
   library(sommer)
 }
 print(xtable(A.mat(M)),type=&quot;html&quot;)</code></pre>
-<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Fri Mar 01 08:27:41 2019 -->
+<!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
+<!-- Sat May 25 07:12:30 2019 -->
 <table border="1">
 <tr>
 <th>
@@ -353,11 +353,11 @@ Ind3
 ## -0.2307692 -0.2307692  0.6923077</code></pre>
 <p>Ind1和Ind2个体的近交系数为负值，这表明基因组近交系数跟传统的基于系谱的近交系数并不在一个尺度上。</p>
 <p>个体间的基因组亲缘关系，譬如j、k个体间的亲缘关系，= <span class="math inline">\(G_{jk}/\sqrt{G_{jj}G_{kk}}\)</span>。</p>
-<p>现在计算Ind1和Ind2个体间的亲缘关系，= <span class="math inline">\(G_{12}/\sqrt{G_{11}G_{22}}\)</span> = 0.13。</p>
-<p>由于对角线元素一般都在1左右，因此j与k的亲缘（relationship）系数也就基本约等于G矩阵中相对应的值。</p>
-<p>因此这里可以G阵看做传统A阵，那么j与k的共亲系数（coancestry）也就是G阵中相对应的亲缘系数的一半。</p>
+<p>现在计算Ind1和Ind2个体间的亲缘关系，= <span class="math inline">\(G_{12}/\sqrt{G_{11}G_{22}}\)</span> = 0.13。这个系数，跟经典的<a href="#2">Relationship coefficient of Wright （1922）</a>非常相似。</p>
+<p>由于对角线元素一般都在1左右，因此j与k的基因组亲缘关系（Genomic relationship）也就基本约等于G矩阵中相对应的值。</p>
+<p>因此这里可以G阵看做传统A阵（Additive genetic relationship matrix 或 numerator relationship matrix），那么j与k的共亲系数（coancestry coefficient）也就是G阵中相对应的系数的一半。</p>
 </div>
-<div class="section level3">
+<div id="section-1" class="section level3">
 <h3>6.2 第二种方法</h3>
 <p><span class="math display">\[G = ZDZ&#39;\]</span></p>
 <p>D是一个对角矩阵，其中<span class="math inline">\(D_{ii}\)</span>等于
@@ -368,8 +368,8 @@ Ind3
 D &lt;- diag(D_ii,ncol(M))
 G &lt;- Z %*% D %*% t(Z)
 print(xtable(G),type=&quot;html&quot;)</code></pre>
-<!-- html table generated in R 3.5.1 by xtable 1.8-3 package -->
-<!-- Fri Mar 01 08:27:41 2019 -->
+<!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
+<!-- Sat May 25 07:12:30 2019 -->
 <table border="1">
 <tr>
 <th>
@@ -428,6 +428,7 @@ Ind3
 </tr>
 </table>
 <p>参考文献：</p>
-<p><a id="1">Vanraden P M. Efficient methods to compute genomic predictions.[J]. Journal of Dairy Science, 2008, 91(11):4414-4423.</a></p>
+<p><a id="1">Vanraden P M. Efficient methods to compute genomic predictions.[J]. Journal of Dairy Science, 2008, 91(11):4414-4423.</a>
+<a id="2">Wright, S. 1922. Coefficients of inbreeding and relationship. Am.Nat. 56:330–338.</a></p>
 </div>
 </div>
