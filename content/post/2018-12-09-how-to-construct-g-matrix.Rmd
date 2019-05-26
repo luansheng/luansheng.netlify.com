@@ -196,7 +196,7 @@ Ind1和Ind2个体的近交系数为负值，这表明基因组近交系数跟传
 
 由于对角线元素一般都在1左右，因此j与k的基因组亲缘关系（Genomic relationship）也就基本约等于G矩阵中相对应的值。
 
-因此这里可以G阵看做传统A阵（Additive genetic relationship matrix 或 numerator relationship matrix），那么j与k的共亲系数（coancestry coefficient）也就是G阵中相对应的系数的一半。
+如果把G阵与传统A阵（Additive genetic relationship matrix 或 numerator relationship matrix）类比，那么j与k的共亲系数（coancestry coefficient）同样是基因组亲缘系数的一半。
 
 ### 6.2 第二种方法
 

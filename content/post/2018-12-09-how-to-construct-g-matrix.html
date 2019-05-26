@@ -56,7 +56,7 @@ genotypes &lt;-
   )
 print(xtable(genotypes),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
-<!-- Sat May 25 07:12:28 2019 -->
+<!-- Sat May 25 19:28:03 2019 -->
 <table border="1">
 <tr>
 <th>
@@ -223,7 +223,7 @@ Z</code></pre>
 G &lt;- Z %*% t(Z) / d
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
-<!-- Sat May 25 07:12:30 2019 -->
+<!-- Sat May 25 19:28:05 2019 -->
 <table border="1">
 <tr>
 <th>
@@ -289,7 +289,7 @@ if (!is_installed) {
 }
 print(xtable(A.mat(M)),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
-<!-- Sat May 25 07:12:30 2019 -->
+<!-- Sat May 25 19:28:05 2019 -->
 <table border="1">
 <tr>
 <th>
@@ -355,7 +355,7 @@ Ind3
 <p>个体间的基因组亲缘关系，譬如j、k个体间的亲缘关系，= <span class="math inline">\(G_{jk}/\sqrt{G_{jj}G_{kk}}\)</span>。</p>
 <p>现在计算Ind1和Ind2个体间的亲缘关系，= <span class="math inline">\(G_{12}/\sqrt{G_{11}G_{22}}\)</span> = 0.13。这个系数，跟经典的<a href="#2">Relationship coefficient of Wright （1922）</a>非常相似。</p>
 <p>由于对角线元素一般都在1左右，因此j与k的基因组亲缘关系（Genomic relationship）也就基本约等于G矩阵中相对应的值。</p>
-<p>因此这里可以G阵看做传统A阵（Additive genetic relationship matrix 或 numerator relationship matrix），那么j与k的共亲系数（coancestry coefficient）也就是G阵中相对应的系数的一半。</p>
+<p>如果把G阵与传统A阵（Additive genetic relationship matrix 或 numerator relationship matrix）类比，那么j与k的共亲系数（coancestry coefficient）同样是基因组亲缘系数的一半。</p>
 </div>
 <div id="section-1" class="section level3">
 <h3>6.2 第二种方法</h3>
@@ -369,7 +369,7 @@ D &lt;- diag(D_ii,ncol(M))
 G &lt;- Z %*% D %*% t(Z)
 print(xtable(G),type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.5.3 by xtable 1.8-4 package -->
-<!-- Sat May 25 07:12:30 2019 -->
+<!-- Sat May 25 19:28:05 2019 -->
 <table border="1">
 <tr>
 <th>
