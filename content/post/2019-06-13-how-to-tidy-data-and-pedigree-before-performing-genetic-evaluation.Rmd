@@ -1,17 +1,16 @@
 ---
-title: 常规遗传评估需要的数据格式和整理步骤
-author: Sheng Luan
+title: "常规遗传评估需要的数据格式和整理步骤"
+author: "Sheng Luan"
 date: '2019-06-13'
-slug: how-to-tidy-data-and-pedigree-before-performing-genetic-evaluation
-categories:
-  - 数据清洗
-tags:
-  - R
-  - data tidy
 header:
   caption: ''
   image: ''
   preview: yes
+slug: how-to-tidy-data-and-pedigree-before-performing-genetic-evaluation
+tags:
+- R
+- data tidy
+categories: 数据清洗
 ---
 
 ## 文件格式
@@ -124,7 +123,7 @@ gPed_tidy
 
 即便是设置为缺失，应该也是这种情况。
 
-```{r plotPedigree,eval=TRUE,echo=TRUE,fig.width=8,fig.height=6}
+```{r plotPedigree,eval=TRUE,echo=TRUE,fig.width=10, fig.height=8}
 one_pedigree <-
   tidyped(ped = gPed_tidy, cand = gData$AnimalID[nrow(gData)])
 visped(ped = one_pedigree)
